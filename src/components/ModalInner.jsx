@@ -18,12 +18,6 @@ const closeAnim = keyframes`
 `
 
 const Container = styled.div`
-  position: relative;
-  padding: 32px;
-  width: 480px;
-  height: 480px;
-  background-color: whitesmoke;
-
   &.open {
     animation: ${openAnim} 2s forwards;
   }
@@ -32,23 +26,44 @@ const Container = styled.div`
   }
 `
 
+const Container2 = styled.div`
+  position: relative;
+  padding: 32px;
+  width: 480px;
+  height: 480px;
+  background-color: whitesmoke;
+`
+
 export default function ModalInner({closeOverlay}) {
   const [state, setState] = useState()
   const {modal} = useContext(ModalContext)
-
-  useEffect(() => {
-    if (modal) setState('open')
-  }, [modal])
 
   function close() {
     setState('close')
     closeOverlay()
   }
 
+  useEffect(() => {
+    if (modal) setState('open')
+  }, [modal])
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.keyCode === 27) {
+        close()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  })
+
+
   return (
     <>
     <Container className={state}>
+      <Container2>
       <button onClick={close}>close</button>
+      </Container2>
     </Container>
     </>
   )
