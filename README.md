@@ -1,8 +1,9 @@
-# React + Vite
+# Modal-Testing
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Link to Hosted Version
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Summary
+Prototyping of an extensible and customisible modal without using an external modal library.
+
+The modal is available via a context, and will display whatever component is passed into it with customisible show/hide transitions.

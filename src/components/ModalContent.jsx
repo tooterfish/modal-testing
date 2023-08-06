@@ -17,6 +17,10 @@ const Content = styled.div`
   width: 400px;
   height: 400px;
   background-color: whitesmoke;
+
+  & button {
+    padding: 4px;
+  }
 `
 
 export function ModalContent({closeModal}) {
