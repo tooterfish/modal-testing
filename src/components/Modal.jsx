@@ -2,58 +2,84 @@ import { styled, keyframes } from 'styled-components'
 import { useState, useEffect, useContext, cloneElement } from 'react'
 import { ModalContext } from '../contexts/ModalProvider'
 
-const fadeIn = keyframes`
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-`
-
-const fadeOut = keyframes`
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-`
+const emptyTransitions = {
+  'overlayHide': {'anim': '', 'duration': ''},
+  'overlayShow': {'anim': '', 'duration': ''},
+  'innerHide': {'anim': '', 'duration': ''},
+  'innerShow': {'anim': '', 'duration': ''}
+}
 
 const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.2);
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100vh;
+background-color: rgba(0, 0, 0, 0.2);
 
-  align-items: center;
-  justify-content: center;
-  display: ${props => props.$display};
+// align-items: center;
+// justify-content: center;
+display: ${props => props.$display};
 
-  &.hide {
-    animation: ${fadeOut} 0.2s forwards;
+&.close {
+  animation: ${props => props.$transitions.overlayHide.anim} 
+  ${props => props.$transitions.overlayHide.duration} 
+  forwards;
+}
+&.open {
+  animation: ${props => props.$transitions.overlayShow.anim} 
+  ${props => props.$transitions.overlayShow.duration}  
+  forwards;
+}
+`
+
+const ModalInner = styled.div`
+  &.close {
+    animation: ${props => props.$transitions.innerHide.anim} 
+    ${props => props.$transitions.innerHide.duration}
+    forwards;
   }
-  &.show {
-    animation: ${fadeIn} 0.2s forwards;
+  &.open {
+    animation: ${props => props.$transitions.innerShow.anim} 
+    ${props => props.$transitions.innerShow.duration}
+    forwards;
   }
 `
 
 export default function Modal() {
   const {modal, setModal} = useContext(ModalContext)
-  const [state, setState] = useState({'display': 'none', 'animation': 'hide'})
+  const [state, setState] = useState({'display': 'none', 'animation': 'close', 'transitions': emptyTransitions})
 
   useEffect(() => {
-    if (modal) {
-      setState({'display': 'flex', 'animation': 'show'})
+    function handleKeyDown(e) {
+      if (e.keyCode === 27) {
+        closeModal()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  })
+
+  useEffect(() => {
+    if (modal.content) {
+      setState({'display': 'block', 'animation': 'open', 'transitions': modal.transitions})
     }
   }, [modal])
 
 
-  function closeOverlay() {
-    setState({...state, 'animation': 'hide' })
+  function closeModal() {
+    setState({...state, 'animation': 'close' })
     setTimeout(() => {
       setState({...state, 'display': 'none'})
-      setModal('')
+      setModal({'content': '', 'transitions': emptyTransitions})
     }, 250)
   }
 
   return (
-    <ModalOverlay className={state.animation} $display={state.display}>
-      {modal ? cloneElement(modal, {'closeOverlay': closeOverlay}) : ''}
+    <ModalOverlay className={state.animation} $display={state.display} $transitions={state.transitions}>
+      <ModalInner className={state.animation} $transitions={state.transitions}>
+        {modal.content ? cloneElement(modal.content, {'closeModal': closeModal}) : ''}
+      </ModalInner>
     </ModalOverlay>
   )
 }
